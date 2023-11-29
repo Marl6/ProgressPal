@@ -1,5 +1,6 @@
 package com.example.progresspal.screen
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -8,14 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -56,7 +55,7 @@ import com.google.mlkit.vision.text.Text
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPage(navController: NavHostController) {
+fun SignupPage(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPopupVisible by remember { mutableStateOf(false) }
@@ -82,22 +81,21 @@ fun LoginPage(navController: NavHostController) {
                 .align(Alignment.CenterHorizontally)
         )
         Text(
-            text = "Sign In",
+            text = "Sign Up",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif,
-            style = MaterialTheme.typography.bodyLarge, // or any other desired large style
             color = Color(0xFFDD308E),
+            style = MaterialTheme.typography.bodyLarge, // or any other desired large style
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text("Your Email") },
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -107,7 +105,7 @@ fun LoginPage(navController: NavHostController) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Your Password") },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Password
@@ -123,7 +121,7 @@ fun LoginPage(navController: NavHostController) {
         Button(
             onClick = {
                 // Navigate to MainScreen
-                signIn(email, password, navController, ::showPopupMessage)
+                createAccount(email, password, navController, ::showPopupMessage)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -132,7 +130,7 @@ fun LoginPage(navController: NavHostController) {
         ) {
             Icon(Icons.Filled.Send, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Login")
+            Text("Create Account")
         }
 
         Row(
@@ -141,7 +139,7 @@ fun LoginPage(navController: NavHostController) {
                 .padding(vertical = 15.dp)
         ) {
             Text(
-                text = "Don't have an account?",
+                text = "Already have an account?",
                 fontStyle = FontStyle.Italic,
                 style = MaterialTheme.typography.bodyLarge
                     .copy(
@@ -152,7 +150,7 @@ fun LoginPage(navController: NavHostController) {
             )
 
             Text(
-                text = "Sign up here",
+                text = "Login here",
                 fontStyle = FontStyle.Italic,
                 style = MaterialTheme.typography.bodyLarge
                     .copy(
@@ -161,13 +159,12 @@ fun LoginPage(navController: NavHostController) {
                     ),
                 modifier = Modifier
                     .padding(end = 20.dp)
-                    .clickable { navController.navigate(Routes.SignUpScreen.route) }
+                    .clickable { navController.navigate(Routes.StartScreen.route) }
             )
         }
 
-
         if (isPopupVisible) {
-            CustomPopup(popupMessage) {
+            PopUp(popupMessage) {
                 // Dismiss the popup when clicked
                 isPopupVisible = false
             }
@@ -175,27 +172,32 @@ fun LoginPage(navController: NavHostController) {
     }
 }
 
-
-// Function to handle Firebase authentication
-private fun signIn(email: String, password: String, navController: NavHostController,
-                   showPopupMessage: (String) -> Unit) {
+private fun createAccount(
+    email: String,
+    password: String,
+    navController: NavHostController,
+    showPopupMessage: (String) -> Unit
+) {
     val auth = FirebaseAuth.getInstance()
 
-    auth.signInWithEmailAndPassword(email, password)
+    auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Sign in success, navigate to MainScreen
-                navController.navigate(Routes.WelcomeScreen.route)
+                // Sign in success, update UI with the signed-in user's information
+                Log.d(TAG, "createUserWithEmail:success")
+                val user = auth.currentUser
+                navController.navigate(Routes.StartScreen.route)
             } else {
                 // If sign in fails, display a message to the user.
-                Log.w("LoginActivity", "signInWithEmail:failure", task.exception)
+                Log.w(TAG, "createUserWithEmail:failure", task.exception)
                 showPopupMessage("Authentication failed.")
+                reload()
             }
         }
 }
 
 @Composable
-fun CustomPopup(message: String, onDismiss: () -> Unit) {
+fun PopUp(message: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = {
@@ -213,4 +215,6 @@ fun CustomPopup(message: String, onDismiss: () -> Unit) {
             }
         }
     )
+}
+private fun reload() {
 }

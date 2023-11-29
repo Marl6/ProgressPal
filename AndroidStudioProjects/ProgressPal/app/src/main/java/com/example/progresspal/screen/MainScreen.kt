@@ -17,5 +17,11 @@ fun MainScreen() {
         composable(Routes.StartScreen.route) {
             LoginPage(navController = navController)
         }
+        composable(Routes.TodoScreen.route) {
+            TodoScreen(navController = navController)
+        }
+        composable(Routes.SignUpScreen.route) {
+            SignupPage(navController = navController)
+        }
     }
 }

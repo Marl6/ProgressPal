@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.progresspal.R
+import com.example.progresspal.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +58,8 @@ fun WelcomePage(navController: NavHostController) {
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    // Your button click logic here
+                    navController.navigate(Routes.TodoScreen.route)
+
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier

@@ -53,10 +53,13 @@ fun TodoScreen(navController: NavHostController) {
     var date by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("To Do") }
     var todoItems by remember { mutableStateOf(emptyList<TodoItem>()) }
-
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    val statusOptions = listOf("To Do", "In Progress", "Done")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(statusOptions[0]) }
 
     Column(
         modifier = Modifier
@@ -95,13 +98,45 @@ fun TodoScreen(navController: NavHostController) {
         )
 
         // Status Dropdown
-
+        ExposedDropdownMenuBox(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth() // Ensure the width is the same as other text fields
+                    .menuAnchor(),
+                readOnly = true,
+                value = selectedOptionText,
+                onValueChange = {},
+                label = { Text("Status") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                statusOptions.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption) },
+                        onClick = {
+                            selectedOptionText = selectionOption
+                            expanded = false
+                        },
+                    )
+                }
+            }
+        }
 
         // Add Button
         Button(
             onClick = {
                 if (title.isNotEmpty()) {
-                    todoItems = todoItems + TodoItem(title, description, date, status)
+                    todoItems = todoItems + TodoItem(title, description, date, selectedOptionText)
                     title = ""
                     description = ""
                     date = ""

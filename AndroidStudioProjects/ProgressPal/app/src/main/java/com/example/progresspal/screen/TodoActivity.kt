@@ -3,6 +3,7 @@ package com.example.progresspal.screen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,8 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 class TodoActivity(val navController: NavHostController) : ComponentActivity() {
@@ -131,31 +135,39 @@ fun TodoScreen(navController: NavHostController) {
 
 @Composable
 fun TodoCard(todoItem: TodoItem) {
-    Card(
+    OutlinedCard(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(1.dp, Color(0xFFDD308E)),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
                 // Handle card click if needed
             },
-
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = "Title: ${todoItem.title}", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = " ${todoItem.title}",
+                style = TextStyle(
+                    fontSize = 24.sp, // Adjust the size as needed
+                    fontWeight = FontWeight.Bold
+                )
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Description: ${todoItem.description}")
+            Text(text = " ${todoItem.description}")
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Date: ${todoItem.date}")
+            Text(text = " ${todoItem.date}")
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Status: ${todoItem.status}")
         }
     }
 }
-
 
 @Composable
 fun TodoScreenPreview(navController: NavHostController) {
